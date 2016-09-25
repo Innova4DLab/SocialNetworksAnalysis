@@ -165,7 +165,8 @@ public class NodeFriends {
             saveNewFriends(friends, uid, nextLevel);//Almacenar los nuevos nodos y aristas
             
             int startindex=24;
-            while( (respuesta.contains("m_more_friends") && respuesta.contains("startindex="+startindex)) &&
+            while( (respuesta.contains("m_more_friends") && respuesta.contains("startindex="+startindex))  //Asegurar que existe una siguiente pagina
+                                 &&
                    ( nextLevel==1     //En el primer nivel obtener todos los amigos (Sin importar el parametro "amigosMax")
                     || amigosMax == 0  //En caso de que amigosMax sea 0 obtener toda la lista de amigos de cada nodo
                     || startindex<amigosMax) ){ //Solo obtener los amigos indicados por amigosMax
