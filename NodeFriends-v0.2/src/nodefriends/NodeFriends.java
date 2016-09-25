@@ -19,7 +19,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class NodeFriends {
-    private static List<String[]> amigos;//IDUsuario, NombreUsuario, Nivel, NumeroNodo
+    private static List<String[]> amigos;//UID Facebook, NombreUsuario, Nivel, NumeroNodo
     private static List<String[]> links;//NumeroNodoOrigen, NumeroNodoDestino 
     
     private static String email, password;//Credenciales de la cuenta semilla
