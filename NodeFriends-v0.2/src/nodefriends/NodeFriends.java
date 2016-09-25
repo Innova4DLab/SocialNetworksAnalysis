@@ -163,11 +163,7 @@ public class NodeFriends {
         return "-1";//No se encontro coincidencia, terminar la ejecución.
     }
     
-    ///icluster.puebla/about
-    //Me->100003558519747
-    //https://m.facebook.com/profile.php?v=friends&id=100003558519747
-    //Icluster      
-    //https://m.facebook.com/profile.php?v=friends&id=100011757582987
+ 
     public static void getFriends(WebClient webClient, String uid, int nextLevel){
         //Preparar URL de amigos
         String urlFriends = "https://m.facebook.com/"+uid+"/friends?";//IDUsuario Alfanumerico
