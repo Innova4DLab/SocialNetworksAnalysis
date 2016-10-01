@@ -18,6 +18,10 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+
+/*
+    joseluisvzg@gmail.com
+*/
 public class NodeFriends {
     private static List<String[]> amigos;//UID Facebook, NombreUsuario, Nivel, NumeroNodo
     private static List<String[]> links;//NumeroNodoOrigen, NumeroNodoDestino 
