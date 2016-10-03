@@ -173,7 +173,7 @@ public class NodeFriends {
                                 &&
                    ( nextLevel==1     //En el primer nivel obtener todos los amigos (Sin importar el parametro "amigosMax")
                     || amigosMax == 0  //En caso de que amigosMax sea 0 obtener toda la lista de amigos de cada nodo
-                    || startindex<amigosMax) 
+                    || startindex<=amigosMax) 
                    ){ //Solo obtener los amigos indicados por amigosMax
                 
                 System.out.println("Explorando amigos en:"+urlFriends+"startindex="+startindex);               
