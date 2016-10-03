@@ -110,7 +110,7 @@ public class NodeFriends {
 
     
     public static String parseOwnID(String inStr){
-        String pattern = "\\/composer\\/mbasic\\/\\?av=([0-9]{10,15})";
+        String pattern = "\\\\/composer\\\\/mbasic\\\\/\\?av=([0-9]{10,15})";//\\/composer\\/mbasic\\/\?av=([0-9]{10,15})
 
         // Crear un objeto Pattern a partir de la expresión regular
         Pattern r = Pattern.compile(pattern);
