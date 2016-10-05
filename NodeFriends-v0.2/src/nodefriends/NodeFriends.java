@@ -82,10 +82,10 @@ public class NodeFriends {
             amigos.add(new String[]{ownID, "Me", "0", "1"});//Agregar a la lista la cuenta semilla
             
             int x=0;//Indice de elemento a explorar
-            while(x<amigos.size()){//Recorrer todos los amigos
+            while(x<amigos.size()){//Recorrer todos los nodos
                 int levelNode=Integer.parseInt(amigos.get(x)[2]);//Obtener nivel
                 String nodeId=amigos.get(x)[0];//Obtener IDUsuario
-                if(levelNode<maxLevel){//Solo explorar los amigos que cumplan con el nivel especificado
+                if(levelNode<maxLevel){//Solo explorar los nodos hijos de los nodos que cumplan con el nivel maximo especificado
                     getFriends(webClient, nodeId, levelNode+1);
                 }
                 System.out.println("Tamaño de la lista amigos ahora es:"+amigos.size());
