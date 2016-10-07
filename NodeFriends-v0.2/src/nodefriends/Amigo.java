@@ -6,7 +6,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 /**
  * Created by Thagus on 07/10/16.
  */
-public class Amigo{
+public class Amigo implements Comparable<Amigo>{
     //UID Facebook, NombreUsuario, Nivel, NumeroNodo
     String uidFacebook;
     String nombreUsuario;
@@ -38,5 +38,10 @@ public class Amigo{
         return new EqualsBuilder()
                 .append(uidFacebook, rhs.uidFacebook)
                 .isEquals();
+    }
+
+    @Override
+    public int compareTo(Amigo o) {
+        return this.uidFacebook.compareTo(o.uidFacebook);
     }
 }
