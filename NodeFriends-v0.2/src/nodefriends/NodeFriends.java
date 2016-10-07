@@ -30,10 +30,10 @@ public class NodeFriends {
     private static int amigosMax;//Numero de amigos maximos a obtener
 
     public NodeFriends(String email, String password, int maxLevel, int amigosMax) {//Constructor
-        this.email = email;
-        this.password = password;
-        this.maxLevel = maxLevel;
-        this.amigosMax = amigosMax;
+        NodeFriends.email = email;
+        NodeFriends.password = password;
+        NodeFriends.maxLevel = maxLevel;
+        NodeFriends.amigosMax = amigosMax;
     }
 
     public int run() {
