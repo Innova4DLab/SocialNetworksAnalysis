@@ -86,7 +86,12 @@ public class NodeFriends {
                 newAdditions = false;
                 HashSet<Amigo> tmpFriends = new HashSet<>();
 
+                System.out.println("Nodos a procesar: " + newFriends.size());
+                int count = 0;
+
                 for (Amigo amigo : newFriends) {
+                    count++;
+                    System.out.println("Procesando nodo " + count);
                     int levelNode = amigo.nivel;
                     if (levelNode < maxLevel) {
                         newAdditions = getFriends(webClient, amigo.uidFacebook, levelNode + 1, tmpFriends);
@@ -170,6 +175,8 @@ public class NodeFriends {
             List<String[]> friends = parseFriends(respuesta);//Obtener codigo html de la petición y parsearlo
             newAdditions = saveNewFriends(friends, uid, nextLevel, tmpFriends);//Almacenar los nuevos nodos y aristas
 
+            System.out.println("Tamaño de la lista amigos ahora es:"+amigosTable.size());
+
             int startindex=24;
             while( (respuesta.contains("m_more_friends") && respuesta.contains("startindex="+startindex)) //Asegurar que existe una siguiente pagina
                                 &&
@@ -239,7 +246,6 @@ public class NodeFriends {
         //Expresión regular
         String pattern = "";
 
-        //Seleccionar tipo de parseado
         pattern = "href=\"\\/(profile.php\\?id=)?(.[^\\?\\&\\\"]*).[^>]*>(.[^<]*)<\\/a>";
 
         //Crear objeto Pattern a partir de la expresión regular
