@@ -42,6 +42,6 @@ public class Amigo implements Comparable<Amigo>{
 
     @Override
     public int compareTo(Amigo o) {
-        return this.uidFacebook.compareTo(o.uidFacebook);
+        return Integer.compare(this.numeroNodo, o.numeroNodo);
     }
 }
