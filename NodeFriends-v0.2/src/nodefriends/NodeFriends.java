@@ -12,9 +12,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -23,8 +21,8 @@ import java.util.regex.Pattern;
     joseluisvzg@gmail.com
 */
 public class NodeFriends {
-    private static List<String[]> amigos;//UID Facebook, NombreUsuario, Nivel, NumeroNodo
-    private static List<String[]> links;//NumeroNodoOrigen, NumeroNodoDestino 
+    private static HashMap<String, Amigo> amigosTable;
+    private static HashSet<Link> linksSet;
     
     private static String email, password;//Credenciales de la cuenta semilla
     private static String uidUser, username;
@@ -40,8 +38,8 @@ public class NodeFriends {
     
     public int run() {
         //Inicializar listas
-        amigos = new LinkedList<>();
-        links = new LinkedList<>();
+        amigosTable = new HashMap<>();
+        linksSet = new HashSet<>();
         
         try {
             //Crear un objeto WebClient
@@ -78,25 +76,32 @@ public class NodeFriends {
                 return -2;//Username no encontrado (Error inesperado)
             }
             username=ownUsername;
-            
-            amigos.add(new String[]{ownID, "Me", "0", "1"});//Agregar a la lista la cuenta semilla
-            
-            int x=0;//Indice de elemento a explorar
-            while(x<amigos.size()){//Recorrer todos los nodos
-                int levelNode=Integer.parseInt(amigos.get(x)[2]);//Obtener nivel
-                String nodeId=amigos.get(x)[0];//Obtener IDUsuario
-                if(levelNode<maxLevel){//Solo explorar los nodos hijos de los nodos que cumplan con el nivel maximo especificado
-                    getFriends(webClient, nodeId, levelNode+1);
+
+            amigosTable.put("Me", new Amigo(ownID, "Me", 0, 1));    //Agregar a la lista la cuenta semilla
+
+            boolean newAdditions = true;
+            HashSet<Amigo> newFriends = new HashSet<>(amigosTable.values());
+
+            while(newAdditions) {
+                newAdditions = false;
+                HashSet<Amigo> tmpFriends = new HashSet<>();
+
+                for (Amigo amigo : newFriends) {
+                    int levelNode = amigo.nivel;
+                    if (levelNode < maxLevel && !amigo.alreadyProcessed) {
+                        newAdditions = getFriends(webClient, amigo.uidFacebook, levelNode + 1, tmpFriends);
+                        amigo.alreadyProcessed = true;
+                    }
                 }
-                System.out.println("Tamaño de la lista amigos ahora es:"+amigos.size());
-                x++;
+
+                newFriends = tmpFriends;
+                System.out.println("Tamaño de la lista amigos ahora es:" + amigosTable.size());
             }
-            
+
             System.out.println("Lista de todos los amigos:");
-            for(String[] node:amigos){
-                System.out.println("Amigo> IDUsuario:"+node[0]+", NombreUsuario:"+node[1]);
+            for(Map.Entry<String, Amigo> entry : amigosTable.entrySet()){
+                System.out.println("Amigo> IDUsuario:" + entry.getKey() + ", NombreUsuario:" + entry.getValue().nombreUsuario);
             }
-            
         } catch (Exception e) {
             e.printStackTrace();
             return -2;//Ocurrio un error!!!
@@ -155,7 +160,7 @@ public class NodeFriends {
         return "-1";//No se encontro coincidencia, terminar la ejecución.
     }
     
-    public static void getFriends(WebClient webClient, String uid, int nextLevel){
+    public static boolean getFriends(WebClient webClient, String uid, int nextLevel, HashSet<Amigo> tmpFriends){
         //Preparar URL de amigos. Existen 2 tipos de URL dependiendo del formato del UID obtenido
         String urlFriends = "https://m.facebook.com/"+uid+"/friends?";//IDUsuario Alfanumerico
         if(uid.matches("[0-9]*")){//IDUsuario Numerico
@@ -164,9 +169,10 @@ public class NodeFriends {
         
         System.out.println("Explorando amigos en:"+urlFriends);
         try {
+            boolean newAdditions;
             String respuesta = webClient.getPage(urlFriends).getWebResponse().getContentAsString();//Hacer petición HTTP
             List<String[]> friends = parseFriends(respuesta, 1);//Obtener codigo html de la petición y parsearlo
-            saveNewFriends(friends, uid, nextLevel);//Almacenar los nuevos nodos y aristas
+            newAdditions = saveNewFriends(friends, uid, nextLevel, tmpFriends);//Almacenar los nuevos nodos y aristas
             
             int startindex=24;
             while( (respuesta.contains("m_more_friends") && respuesta.contains("startindex="+startindex)) //Asegurar que existe una siguiente pagina
@@ -180,55 +186,56 @@ public class NodeFriends {
                 respuesta = webClient.getPage(urlFriends+"startindex="+startindex).getWebResponse().getContentAsString();//Hacer petición HTTP
 
                 friends = parseFriends(respuesta, 2);//Obtener codigo html de la petición y parsearlo
-                saveNewFriends(friends, uid, nextLevel);//Almacenar los nuevos nodos y aristas
+                newAdditions = saveNewFriends(friends, uid, nextLevel, tmpFriends) || newAdditions;//Almacenar los nuevos nodos y aristas
 
-                System.out.println("Tamaño de la lista amigos ahora es:"+amigos.size());
+                System.out.println("Tamaño de la lista amigos ahora es:"+amigosTable.size());
                 startindex+=36;//Para acceder a la siguiente página hay que sumar 36
             }
+            return newAdditions;
         } catch (Exception e) {
             System.out.println("Obteniendo Amigos:");
             e.printStackTrace();
         }
+        return false;
     }   
     
-    public static void saveNewFriends(List<String[]> newFriends, String uid, int nextLevel){
+    public static boolean saveNewFriends(List<String[]> newFriends, String uid, int nextLevel, HashSet<Amigo> tmpFriends){
+        boolean newAdditions = false;
         //Iterar nuevos amigos
         for(String[] friend:newFriends){
-            if (!idExist(friend[0]) && !friend[0].equalsIgnoreCase(username)){//Agregar amigo si no existe en la sita & Si no es el usuario semilla
-                amigos.add(new String[]{friend[0], friend[1], String.valueOf(nextLevel), String.valueOf(amigos.size()+1)});
+            if(!amigosTable.containsKey(friend[0])){
+                Amigo newFriend = new Amigo(friend[0], friend[1], nextLevel, amigosTable.size()+1);
+
+                tmpFriends.add(newFriend);
+                amigosTable.put(friend[0], newFriend);
+
                 System.out.println("AddNode>"+friend[0]+":"+friend[1]);
+                newAdditions = true;
             }
 
-            if(!String.valueOf(idNode(uid)).equals(String.valueOf(idNode(friend[0])))){//Evitar relaciones loop (arista que apunta al mismo nodo) 
+            if(!String.valueOf(idNode(uid)).equals(String.valueOf(idNode(friend[0])))){//Evitar relaciones loop (arista que apunta al mismo nodo)
                 if(friend[0].equalsIgnoreCase(username)){//En caso de ser amigo del usuario semilla (friend[0]==username) se empleara el uid del usuario semilla
-                    links.add(new String[]{String.valueOf(idNode(uid)), String.valueOf(idNode(uidUser))});
+                    linksSet.add(new Link(idNode(uid), idNode(uidUser)));
                 }else{
-                    links.add(new String[]{String.valueOf(idNode(uid)), String.valueOf(idNode(friend[0]))});
+                    linksSet.add(new Link(idNode(uid), idNode(friend[0])));
                 }
             }
         }
+
+        return newAdditions;
     }
     
     public static int idNode(String uid){
         if(uid.equals(username) || uid.equals(uidUser)){
             return 1;
         }
-        
-        for(int i=0 ;i<amigos.size(); i++){
-            if(amigos.get(i)[0].equalsIgnoreCase(uid)){
-                return Integer.parseInt(amigos.get(i)[3]);
-            }
+
+        Amigo amigo = amigosTable.get(uid);
+        if(amigo!=null){
+            return amigo.numeroNodo;
         }
+
         return -1;
-    }
-    
-    public static boolean idExist(String uid){//Verificar si un UID de usuario existe en la lista de nodos
-        for(String[] node:amigos){
-            if(node[0].equalsIgnoreCase(uid)){
-                return true;
-            }
-        }
-        return false;
     }
     
     public static List<String[]> parseFriends(String inText, int parseType){//Extraer amigos de a partir de un documento HTML
@@ -284,46 +291,45 @@ public class NodeFriends {
 
     public static void saveNodes(){
         try {
-                File file = new File("Nodos.csv");
-                //Si el archivo no existe crearlo
-                if (!file.exists()) {
-                        file.createNewFile();
-                }
-                FileWriter fw = new FileWriter(file.getAbsoluteFile());
-                PrintWriter printW = new PrintWriter(fw);
+            File file = new File("Nodos.csv");
+            //Si el archivo no existe crearlo
+            if (!file.exists()) {
+                file.createNewFile();
+            }
+            FileWriter fw = new FileWriter(file.getAbsoluteFile());
+            PrintWriter printW = new PrintWriter(fw);
                 
-                printW.println("uid,label,id");
-                for(String[] node:amigos){
-                    printW.println(node[0]+", "+node[1]+","+node[3]+"");
-                }
-               
-                printW.close();
-                fw.close();
+            printW.println("uid,label,id");
+            for(Amigo amigo : amigosTable.values()){
+                printW.println(amigo.uidFacebook+", "+amigo.nombreUsuario+","+amigo.numeroNodo+"");
+            }
+
+            printW.close();
+            fw.close();
         } catch (IOException e) {
-                e.printStackTrace();
+            e.printStackTrace();
         }
     }
-    
+
     public static void saveLinks(){
         try {
-                File file = new File("Aristas.csv");
-                //Si el archivo no existe crearlo
-                if (!file.exists()) {
-                        file.createNewFile();
-                }
-                FileWriter fw = new FileWriter(file.getAbsoluteFile());
-                PrintWriter printW = new PrintWriter(fw);
-                
-                printW.println("Source,Target,Type");
-                for(String[] link:links){
-                    printW.println(""+link[0]+","+link[1]+",undirected");
-                }
-                
-                printW.close();
-                fw.close();
+            File file = new File("Aristas.csv");
+            //Si el archivo no existe crearlo
+            if (!file.exists()) {
+                file.createNewFile();
+            }
+            FileWriter fw = new FileWriter(file.getAbsoluteFile());
+            PrintWriter printW = new PrintWriter(fw);
+
+            printW.println("Source,Target,Type");
+            for(Link link : linksSet){
+                printW.println(""+link.numeroNodoOrigen+","+link.numeroNodoDestino+",undirected");
+            }
+
+            printW.close();
+            fw.close();
         } catch (IOException e) {
-                e.printStackTrace();
+            e.printStackTrace();
         }
     }
-    
 }
