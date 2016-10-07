@@ -155,17 +155,19 @@ public class NodeFriends {
     }
 
     public static boolean getFriends(WebClient webClient, String uid, int nextLevel, HashSet<Amigo> tmpFriends){
-        //Preparar URL de amigos. Existen 2 tipos de URL dependiendo del formato del UID obtenido
-        String urlFriends = "https://m.facebook.com/"+uid+"/friends?";//IDUsuario Alfanumerico
-        if(uid.matches("[0-9]*")){//IDUsuario Numerico
-            urlFriends = "https://m.facebook.com/profile.php?v=friends&id="+uid+"&";
-        }
-
-        System.out.println("Explorando amigos en:"+urlFriends);
         try {
             boolean newAdditions;
+
+            //Preparar URL de amigos. Existen 2 tipos de URL dependiendo del formato del UID obtenido
+            String urlFriends = "https://m.facebook.com/"+uid+"/friends?";//IDUsuario Alfanumerico
+            if(uid.matches("\\d+")){//IDUsuario Numerico
+                urlFriends = "https://m.facebook.com/profile.php?v=friends&id="+uid+"&";
+            }
+
+            System.out.println("Explorando amigos en:"+urlFriends);
+
             String respuesta = webClient.getPage(urlFriends).getWebResponse().getContentAsString();//Hacer petición HTTP
-            List<String[]> friends = parseFriends(respuesta, 1);//Obtener codigo html de la petición y parsearlo
+            List<String[]> friends = parseFriends(respuesta);//Obtener codigo html de la petición y parsearlo
             newAdditions = saveNewFriends(friends, uid, nextLevel, tmpFriends);//Almacenar los nuevos nodos y aristas
 
             int startindex=24;
@@ -179,7 +181,7 @@ public class NodeFriends {
                 System.out.println("Explorando amigos en:"+urlFriends+"startindex="+startindex);
                 respuesta = webClient.getPage(urlFriends+"startindex="+startindex).getWebResponse().getContentAsString();//Hacer petición HTTP
 
-                friends = parseFriends(respuesta, 2);//Obtener codigo html de la petición y parsearlo
+                friends = parseFriends(respuesta);//Obtener codigo html de la petición y parsearlo
                 newAdditions = saveNewFriends(friends, uid, nextLevel, tmpFriends) || newAdditions;//Almacenar los nuevos nodos y aristas
 
                 System.out.println("Tamaño de la lista amigos ahora es:"+amigosTable.size());
@@ -232,17 +234,13 @@ public class NodeFriends {
         return -1;
     }
 
-    public static List<String[]> parseFriends(String inText, int parseType){//Extraer amigos de a partir de un documento HTML
+    public static List<String[]> parseFriends(String inText){//Extraer amigos de a partir de un documento HTML
         List<String[]> friends = new LinkedList<>();
         //Expresión regular
         String pattern = "";
 
         //Seleccionar tipo de parseado
-        if(parseType == 1){//Regex para primera pagina de amigos
-           pattern = "class=\"c.\" href=\"\\/(profile.php\\?id=)?(.[^\\?\\&\\\"]*).[^>]*>(.[^<]*)<\\/a>";
-        }else{//Regex para pagina de amigos con parametro "startindex" a partir de 24
-           pattern = "href=\"\\/(profile.php\\?id=)?(.[^\\?\\&\\\"]*).[^>]*>(.[^<]*)<\\/a>";
-        }
+        pattern = "href=\"\\/(profile.php\\?id=)?(.[^\\?\\&\\\"]*).[^>]*>(.[^<]*)<\\/a>";
 
         //Crear objeto Pattern a partir de la expresión regular
         Pattern r = Pattern.compile(pattern);
