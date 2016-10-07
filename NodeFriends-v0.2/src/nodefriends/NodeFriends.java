@@ -298,8 +298,11 @@ public class NodeFriends {
             FileWriter fw = new FileWriter(file.getAbsoluteFile());
             PrintWriter printW = new PrintWriter(fw);
 
+            ArrayList<Amigo> amigos = new ArrayList<>(amigosTable.values());
+            Collections.sort(amigos);
+
             printW.println("uid,label,id");
-            for(Amigo amigo : amigosTable.values()){
+            for(Amigo amigo : amigos){
                 printW.println(amigo.uidFacebook+", "+amigo.nombreUsuario+","+amigo.numeroNodo+"");
             }
 
