@@ -52,10 +52,10 @@ public class NodeFriends {
             final HtmlSubmitInput button = (HtmlSubmitInput) form.getInputsByValue("Log In").get(0);
             //Seleccionar la caja de texto "email" y ingresarle el email de la cuenta semilla
             final HtmlTextInput textField = form.getInputByName("email");
-            textField.setValueAttribute(this.email);
+            textField.setValueAttribute(email);
             //Seleccionar la caja de texto "pass" y ingresarle la contraseña de la cuenta semilla
             final HtmlPasswordInput textField2 = form.getInputByName("pass");
-            textField2.setValueAttribute(this.password);
+            textField2.setValueAttribute(password);
             //Iniciar sesión
             final HtmlPage page2 = button.click();
 
