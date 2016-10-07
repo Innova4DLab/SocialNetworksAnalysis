@@ -96,11 +96,6 @@ public class NodeFriends {
                 newFriends = tmpFriends;
                 System.out.println("Tamaño de la lista amigos ahora es:" + amigosTable.size());
             }
-
-            System.out.println("Lista de todos los amigos:");
-            for(Map.Entry<String, Amigo> entry : amigosTable.entrySet()){
-                System.out.println("Amigo> IDUsuario:" + entry.getKey() + ", NombreUsuario:" + entry.getValue().nombreUsuario);
-            }
         } catch (Exception e) {
             e.printStackTrace();
             return -2;//Ocurrio un error!!!
@@ -301,9 +296,12 @@ public class NodeFriends {
             ArrayList<Amigo> amigos = new ArrayList<>(amigosTable.values());
             Collections.sort(amigos);
 
+            System.out.println("Lista de todos los amigos:");
+
             printW.println("uid,label,id");
             for(Amigo amigo : amigos){
                 printW.println(amigo.uidFacebook+", "+amigo.nombreUsuario+","+amigo.numeroNodo+"");
+                System.out.println("Guardado> " + amigo.uidFacebook+" : "+amigo.nombreUsuario);
             }
 
             printW.close();
