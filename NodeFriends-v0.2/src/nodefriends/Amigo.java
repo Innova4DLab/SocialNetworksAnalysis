@@ -6,16 +6,14 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 /**
  * Created by Thagus on 07/10/16.
  */
-public class Amigo {
+public class Amigo{
     //UID Facebook, NombreUsuario, Nivel, NumeroNodo
     String uidFacebook;
     String nombreUsuario;
     int nivel;
     int numeroNodo;
-    boolean alreadyProcessed;
 
     public Amigo(String uidFacebook, String nombreUsuario, int nivel, int numeroNodo) {
-        this.alreadyProcessed = false;
         this.uidFacebook = uidFacebook;
         this.nombreUsuario = nombreUsuario;
         this.nivel = nivel;

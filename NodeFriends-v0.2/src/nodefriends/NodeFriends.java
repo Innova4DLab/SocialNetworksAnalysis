@@ -23,24 +23,24 @@ import java.util.regex.Pattern;
 public class NodeFriends {
     private static HashMap<String, Amigo> amigosTable;
     private static HashSet<Link> linksSet;
-    
+
     private static String email, password;//Credenciales de la cuenta semilla
     private static String uidUser, username;
     private static int maxLevel;//Nivel de exploración maximo
     private static int amigosMax;//Numero de amigos maximos a obtener
-    
+
     public NodeFriends(String email, String password, int maxLevel, int amigosMax) {//Constructor
         this.email = email;
         this.password = password;
         this.maxLevel = maxLevel;
         this.amigosMax = amigosMax;
     }
-    
+
     public int run() {
         //Inicializar listas
         amigosTable = new HashMap<>();
         linksSet = new HashSet<>();
-        
+
         try {
             //Crear un objeto WebClient
             final WebClient webClient = new WebClient();
@@ -58,20 +58,20 @@ public class NodeFriends {
             textField2.setValueAttribute(this.password);
             //Iniciar sesión
             final HtmlPage page2 = button.click();
-            
+
             //Obtener el IDUsuario de cuenta semilla
             final HtmlPage htmlID = webClient.getPage("https://m.facebook.com/home.php");
             String ownID = parseOwnID(htmlID.getWebResponse().getContentAsString());
-            
+
             if(ownID.equals("-1")){
                 return -1;//IDUsuario no encontrado (credeciales incorrectas)
             }
             uidUser=ownID;
-            
+
             //Obtener Username de cuenta semilla
             final HtmlPage htmlUsername = webClient.getPage("https://www.facebook.com/settings/account/");
             String ownUsername = parseUsername(htmlUsername.getWebResponse().getContentAsString());
-            
+
             if(ownUsername.equals("-1")){
                 return -2;//Username no encontrado (Error inesperado)
             }
@@ -88,9 +88,8 @@ public class NodeFriends {
 
                 for (Amigo amigo : newFriends) {
                     int levelNode = amigo.nivel;
-                    if (levelNode < maxLevel && !amigo.alreadyProcessed) {
+                    if (levelNode < maxLevel) {
                         newAdditions = getFriends(webClient, amigo.uidFacebook, levelNode + 1, tmpFriends);
-                        amigo.alreadyProcessed = true;
                     }
                 }
 
@@ -105,7 +104,7 @@ public class NodeFriends {
         } catch (Exception e) {
             e.printStackTrace();
             return -2;//Ocurrio un error!!!
-        }        
+        }
         //Almacenar amigos
         saveNodes();
         //Almacenar relaciones
@@ -113,7 +112,7 @@ public class NodeFriends {
         return 1;//Correct
     }
 
-    
+
     public static String parseOwnID(String inStr){
         String pattern = "\\\\/composer\\\\/mbasic\\\\/\\?av=([0-9]{10,15})";//\\/composer\\/mbasic\\/\?av=([0-9]{10,15})
 
@@ -122,12 +121,12 @@ public class NodeFriends {
 
         // Aplicar la expresión regular sobre el texto
         Matcher m = r.matcher(inStr);
-        
+
         //Obtener la fecha actual
         SimpleDateFormat timeFormat=new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss");
         Date now=new Date(System.currentTimeMillis());
 
-        if (m.find()) {//Se encontro coincidencia 
+        if (m.find()) {//Se encontro coincidencia
             System.out.println("ownID->" + m.group(1));
             return m.group(1);
         } else {//No se encontro coincidencia, guardarlo en un archivo para analizar el problema
@@ -136,7 +135,7 @@ public class NodeFriends {
         }
         return "-1";//No se encontro coincidencia, terminar la ejecución.
     }
-    
+
     public static String parseUsername(String inStr){
         String pattern = "http\\:\\/\\/www.facebook.com\\/<strong>(.[^<]*)</strong>";
 
@@ -145,12 +144,12 @@ public class NodeFriends {
 
         // Aplicar la expresión regular sobre el texto
         Matcher m = r.matcher(inStr);
-        
+
         //Obtener la fecha actual
         SimpleDateFormat timeFormat=new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss");
         Date now=new Date(System.currentTimeMillis());
 
-        if (m.find()) {//Se encontro coincidencia 
+        if (m.find()) {//Se encontro coincidencia
             System.out.println("Username->" + m.group(1));
             return m.group(1);
         } else {//No se encontro coincidencia, guardarlo en un archivo para analizar el problema
@@ -159,30 +158,30 @@ public class NodeFriends {
         }
         return "-1";//No se encontro coincidencia, terminar la ejecución.
     }
-    
+
     public static boolean getFriends(WebClient webClient, String uid, int nextLevel, HashSet<Amigo> tmpFriends){
         //Preparar URL de amigos. Existen 2 tipos de URL dependiendo del formato del UID obtenido
         String urlFriends = "https://m.facebook.com/"+uid+"/friends?";//IDUsuario Alfanumerico
         if(uid.matches("[0-9]*")){//IDUsuario Numerico
             urlFriends = "https://m.facebook.com/profile.php?v=friends&id="+uid+"&";
         }
-        
+
         System.out.println("Explorando amigos en:"+urlFriends);
         try {
             boolean newAdditions;
             String respuesta = webClient.getPage(urlFriends).getWebResponse().getContentAsString();//Hacer petición HTTP
             List<String[]> friends = parseFriends(respuesta, 1);//Obtener codigo html de la petición y parsearlo
             newAdditions = saveNewFriends(friends, uid, nextLevel, tmpFriends);//Almacenar los nuevos nodos y aristas
-            
+
             int startindex=24;
             while( (respuesta.contains("m_more_friends") && respuesta.contains("startindex="+startindex)) //Asegurar que existe una siguiente pagina
                                 &&
                    ( nextLevel==1     //En el primer nivel obtener todos los amigos (Sin importar el parametro "amigosMax")
                     || amigosMax == 0  //En caso de que amigosMax sea 0 obtener toda la lista de amigos de cada nodo
-                    || startindex<=amigosMax) 
+                    || startindex<=amigosMax)
                    ){ //Solo obtener los amigos indicados por amigosMax
-                
-                System.out.println("Explorando amigos en:"+urlFriends+"startindex="+startindex);               
+
+                System.out.println("Explorando amigos en:"+urlFriends+"startindex="+startindex);
                 respuesta = webClient.getPage(urlFriends+"startindex="+startindex).getWebResponse().getContentAsString();//Hacer petición HTTP
 
                 friends = parseFriends(respuesta, 2);//Obtener codigo html de la petición y parsearlo
@@ -197,8 +196,8 @@ public class NodeFriends {
             e.printStackTrace();
         }
         return false;
-    }   
-    
+    }
+
     public static boolean saveNewFriends(List<String[]> newFriends, String uid, int nextLevel, HashSet<Amigo> tmpFriends){
         boolean newAdditions = false;
         //Iterar nuevos amigos
@@ -224,7 +223,7 @@ public class NodeFriends {
 
         return newAdditions;
     }
-    
+
     public static int idNode(String uid){
         if(uid.equals(username) || uid.equals(uidUser)){
             return 1;
@@ -237,36 +236,36 @@ public class NodeFriends {
 
         return -1;
     }
-    
+
     public static List<String[]> parseFriends(String inText, int parseType){//Extraer amigos de a partir de un documento HTML
         List<String[]> friends = new LinkedList<>();
         //Expresión regular
         String pattern = "";
-    
+
         //Seleccionar tipo de parseado
         if(parseType == 1){//Regex para primera pagina de amigos
            pattern = "class=\"c.\" href=\"\\/(profile.php\\?id=)?(.[^\\?\\&\\\"]*).[^>]*>(.[^<]*)<\\/a>";
         }else{//Regex para pagina de amigos con parametro "startindex" a partir de 24
            pattern = "href=\"\\/(profile.php\\?id=)?(.[^\\?\\&\\\"]*).[^>]*>(.[^<]*)<\\/a>";
         }
-        
+
         //Crear objeto Pattern a partir de la expresión regular
         Pattern r = Pattern.compile(pattern);
 
         // Encontrar coincidencias en el texto
         Matcher m = r.matcher(inText);
-        
+
         //Recorrer coincidencias
         while (m.find()) {
             if(!m.group(2).contains(".php") && !m.group(2).contains("/")){ //Mientras no contenga ".php" o "/" es una coincidencia valida
                 friends.add(new String[]{m.group(2), m.group(3)});//Agregar a la lista de amigos
             }
         }
-        
+
         return friends;
     }
-    
-    
+
+
     public static void saveFile(String inPath, String content){
         try {
                 File file = new File(inPath);
@@ -278,7 +277,7 @@ public class NodeFriends {
 
                 FileWriter fw = new FileWriter(file.getAbsoluteFile());
                 BufferedWriter bw = new BufferedWriter(fw);
-                
+
                 bw.write(content);
                 bw.close();
 
@@ -298,7 +297,7 @@ public class NodeFriends {
             }
             FileWriter fw = new FileWriter(file.getAbsoluteFile());
             PrintWriter printW = new PrintWriter(fw);
-                
+
             printW.println("uid,label,id");
             for(Amigo amigo : amigosTable.values()){
                 printW.println(amigo.uidFacebook+", "+amigo.nombreUsuario+","+amigo.numeroNodo+"");
