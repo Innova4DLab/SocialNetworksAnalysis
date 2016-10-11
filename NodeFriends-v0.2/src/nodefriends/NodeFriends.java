@@ -206,7 +206,7 @@ public class NodeFriends {
         boolean newAdditions = false;
         //Iterar nuevos amigos
         for(String[] friend:newFriends){
-            if(!amigosTable.containsKey(friend[0])){
+            if(!amigosTable.containsKey(friend[0]) && !friend[0].equalsIgnoreCase(username)){
                 Amigo newFriend = new Amigo(friend[0], friend[1], nextLevel, amigosTable.size()+1);
 
                 tmpFriends.add(newFriend);
