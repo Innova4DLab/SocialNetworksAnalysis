@@ -1,0 +1,346 @@
+1. "contributors" 
+
+(boolean) This field will only be populated if the user has contributors enabled on his 
+or her account.
+
+2. "truncated": 
+
+(boolean) Indicates whether the value of the text parameter was truncated, 
+for example, as a result of a retweet exceeding the 140 character Tweet length. Truncated 
+text will end in ellipsis, like this ... 
+
+Since Twitter now rejects long Tweets vs truncating them, the large majority of Tweets 
+will have this set to false. Note that while native retweets may have their toplevel text 
+property shortened, the original text will be available under the retweeted_status object 
+and the truncated parameter will be set to the value of the original status (in most 
+cases, false).
+
+3. "text"
+
+(String) Tweet content
+
+4. "is_quote_status"
+
+5. "in_reply_to_status_id"
+
+(Int64) If the represented Tweet is a reply, this field will contain the integer representation 
+of the original Tweet’s ID.
+
+6. "id"
+
+(Int64) The integer representation of the unique identifier for this Tweet. This number is 
+greater than 53 bits and some programming languages may have difficulty/silent defects 
+in interpreting it. Using a signed 64 bit integer for storing this identifier is safe. 
+
+7. "favorite_count"
+
+(Int) Indicates approximately how many times a Tweet has been “liked” by Twitter users.
+ 
+8. "source"
+
+(String) Utility used to post the Tweet, as an HTML-formatted string. Tweets from the 
+Twitter website have a source value of web.
+
+9. "retweeted"
+
+(boolean) Indicates whether a Tweet has been retweeted by the authenticating user.
+ 
+10. "coordinates"
+
+(floats) The longitude and latitude of the Tweet’s location, as an collection in the 
+form of [longitude, latitude]. 
+ 
+11. "timestamp_ms"
+
+12. "entities"
+
+Entities provide metadata and additional contextual information about content posted 
+on Twitter. Entities are never divorced from the content they describe. In API v1.1, 
+entities are returned wherever Tweets are found in the API. Entities are instrumental 
+in resolving URLs.
+
+
+13. "entities"-"user_mentions"
+
+(Array of Object) Represents other Twitter users mentioned in the text of the Tweet.
+
+"entities"-"user_mentions"-"id"
+(Int)ID of the mentioned user, as an integer.
+
+14. "entities"-"user_mentions"-"indices"
+
+(Array of integer) An array of integers representing the offsets within the Tweet text 
+where the user reference begins and ends. The first integer represents the location of 
+the ‘@’ character of the user mention. The second integer represents the location of the 
+first non-screenname character following the user mention.
+
+15. "entities"-"user_mentions"-"id_str"
+
+(Int) Id of the mentioned user, as a Int.
+
+16."entities"-"user_mentions"-"screen_name"
+
+(String) Screen name of the referenced user. 
+
+17. "entities"-"user_mentions"-"name"
+
+(String)  Display name of the referenced user.
+
+18. "entities"-"symbols"
+
+19. "entities"-"hashtags"
+
+(String) Represents hashtags which have been parsed out of the Tweet text.
+
+20. "entities"-"urls"
+
+(String) Represents URLs included in the text of a Tweet or within textual fields 
+of a user object.
+
+21. "in_reply_to_screen_name"
+
+(String) If the represented Tweet is a reply, this field will contain the screen name 
+of the original Tweet’s author.
+
+22. "id_str"
+
+(String) The string representation of the ID of the user who contributed to this Tweet.
+
+23. "retweet_count"
+
+(Int) Number of times this Tweet has been retweeted. This field is no longer capped at 
+99 and will not turn into a String for “100+”		
+ 
+24. "in_reply_to_user_id"
+ 
+(Int) If the represented Tweet is a reply, this field will contain the integer 
+representation of the original Tweet’s author ID. This will not necessarily always be 
+the user directly mentioned in the Tweet.
+
+25. "favorited"
+
+(boolean)Indicates whether this Tweet has been liked by the authenticating user.
+
+26. "user"
+
+(Array of Object) The user who posted the Tweet
+
+27. "user"-"follow_request_sent"
+
+(boolean) When true, indicates that the authenticating user has issued a follow request 
+to this protected user account.
+
+28. "user"-"profile_use_background_image"
+
+(boolean) When true, indicates the user wants their uploaded background image to be used.
+
+29. "user"-"default_profile_image"
+
+(boolean) When true, indicates that the user has not uploaded their own avatar and a 
+default egg avatar is used instead.
+
+30. "user"-"id"
+
+(Int)The integer representation of the unique identifier for this User. 
+
+31. "user"-"verified"
+
+When true, indicates that the user has a verified account.
+
+32. "user"-"profile_image_url_https"
+
+(String) A HTTPS-based URL pointing to the user’s avatar image.
+
+33. "user"-"profile_sidebar_fill_color"
+
+(String) The hexadecimal color the user has chosen to display sidebar backgrounds with 
+in their Twitter UI.
+
+34. "user"-"profile_text_color"
+
+(String) The hexadecimal color the user has chosen to display text with in their Twitter UI.
+
+35. "user"-"followers_count"
+
+(Int) The number of followers this account currently has. Under certain conditions of 
+duress, this field will temporarily indicate “0.”
+
+36. "user"-"profile_sidebar_border_color"
+
+(String) The hexadecimal color the user has chosen to display sidebar borders with in 
+their Twitter UI.
+
+37. "user"-"id_str"
+
+(String) The string representation of the unique identifier for this User. Implementations 
+should use this rather than the large, possibly un-consumable integer in id.
+
+38. "user"-"profile_background_color"
+
+(String) The hexadecimal color chosen by the user for their background.
+
+39. "user"-"listed_count"
+
+(Int) The number of public lists that this user is a member of.
+
+40. "user"-"profile_background_image_url_https"
+
+(String) A HTTPS-based URL pointing to the background image the user has uploaded for 
+their profile.
+
+41. "user"-"utc_offset"
+
+(Int) The offset from GMT/UTC in seconds.
+
+42. "user"-"statuses_count"
+
+(Int) The number of tweets (including retweets) issued by the user.
+
+43. "user"-"description"
+
+(String) The user-defined UTF-8 string describing their account.
+
+44. "user"-"friends_count"
+
+(Int) The number of users this account is following (AKA their “followings”). Under 
+certain conditions of duress, this field will temporarily indicate “0.”
+
+45. "user"-"location"
+
+(String) The user-defined location for this account’s profile. Not necessarily a 
+location nor parseable. This field will occasionally be fuzzily interpreted by the 
+Search service.
+
+46. "user"-"profile_link_color"
+
+(String) The hexadecimal color the user has chosen to display links with in their 
+Twitter UI.
+
+47. "user"-"profile_image_url"
+
+(String) A HTTP-based URL pointing to the user’s avatar image. 
+
+48. "user"-"following"
+
+(String) When true, indicates that the authenticating user is following this user. 
+Some false negatives are possible when set to “false,” but these false negatives are 
+increasingly being represented as “null” instead.
+
+49. "user"-"geo_enabled"
+
+(boolean) When true, indicates that the user has enabled the possibility of geotagging 
+their Tweets. 
+
+50. "user"-"profile_banner_url"
+
+(String) The HTTPS-based URL pointing to the standard web representation of the user’s 
+uploaded profile banner.
+
+51. "user"-"profile_background_image_url"
+
+(Sring) A HTTP-based URL pointing to the background image the user has uploaded for their 
+profile.
+
+52. "user"-"name"
+
+(String) The name of the user, as they’ve defined it. Not necessarily a person’s name. 
+Typically capped at 20 characters, but subject to change.
+
+53. "user"-"lang"
+
+(String) The BCP 47 code for the user’s self-declared user interface language. May or 
+may not have anything to do with the content of their Tweets.
+
+53. "user"-"profile_background_tile"
+
+(boolean) When true, indicates that the user’s profile_background_image_url should be 
+tiled when displayed.
+
+54. "user"-"favourites_count"
+
+(Int) The number of tweets this user has favorited in the account’s lifetime. 
+British spelling used in the field name for historical reasons.
+
+55. "user"-"screen_name"
+
+(String) The screen name, handle, or alias that this user identifies themselves with. 
+screen_names are unique but subject to change. Use id_str as a user identifier whenever 
+possible. Typically a maximum of 15 characters long, but some historical accounts may 
+exist with longer names.
+
+56. "user"-"notifications"
+
+(boolean) Nullable. Deprecated. May incorrectly report “false” at times. Indicates whether the 
+authenticated user has chosen to receive this user’s tweets by SMS.
+
+57. "user"-"url"
+
+(String) A URL provided by the user in association with their profile.
+
+58. "user"-"created_at"
+
+(String) The UTC datetime that the user account was created on Twitter.
+
+59. "user"-"contributors_enabled"
+
+(boolean) Indicates that the user has an account with “contributor mode” enabled, 
+allowing for Tweets issued by the user to be co-authored by another account. 
+
+60. "user"-"time_zone"
+
+(String) A string describing the Time Zone this user declares themselves within.
+
+61. "user"-"protected"
+
+(boolean) When true, indicates that this user has chosen to protect their Tweets. 
+
+62. "user"-"default_profile"
+
+(boolean) When true, indicates that the user has not altered the theme or background of 
+their user profile.
+
+63. "user"-"is_translator"
+
+(boolean) When true, indicates that the user is a participant in Twitter’s translator 
+community.
+
+64. "geo"
+
+(Float)	Deprecated. Nullable. Use the “coordinates” field instead. 
+
+65. "in_reply_to_user_id_str"
+
+(String) If the represented Tweet is a reply, this field will contain the 
+string representation of the original Tweet’s author ID. This will not necessarily 
+always be the user directly mentioned in the Tweet.
+
+66. "lang"
+
+(String) When present, indicates a BCP 47 language identifier corresponding to the 
+machine-detected language of the Tweet text, or “und” if no language could be 
+detected.
+
+67. "created_at"
+
+(String) UTC time when this Tweet was created.
+
+68. "filter_level"
+	
+(String) Indicates the maximum value of the filter_level parameter which may be used
+and still stream this Tweet. So a value of medium will be streamed on none, low, and 
+medium streams.
+ 
+69. "in_reply_to_status_id_str"
+
+(String) If the represented Tweet is a reply, this field will contain the string 
+representation of the original Tweet’s ID.
+ 
+70. "place"
+
+When present, indicates that the tweet is associated (but not necessarily originating 
+from) a Place.
+
+71. "entities"-"sizes"
+
+(Array of Object) An object showing available sizes for the media file.
+
