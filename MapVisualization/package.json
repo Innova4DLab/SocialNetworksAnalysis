@@ -7,9 +7,9 @@
     "start": "node app"
   },
   "dependencies": {
-    "@google/maps": "*"
+    "@google/maps": "*",
     "express": "*",
     "twitter": "*",
-    "socket.io": "*",
+    "socket.io": "*"
   }
 }
