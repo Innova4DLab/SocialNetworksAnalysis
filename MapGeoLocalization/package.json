@@ -1,0 +1,16 @@
+{
+  "name": "twitter-streaming",
+  "version": "0.0.1",
+  "author": "joseluisvzg",
+  "private": true,
+  "scripts": {
+    "start": "node app"
+  },
+  "dependencies": {
+    "@google/maps": "*",
+    "express": "*",
+    "twitter": "*",
+    "socket.io": "*",
+    "mongoose": "*"
+  }
+}
